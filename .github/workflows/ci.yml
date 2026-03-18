@@ -45,6 +45,11 @@ jobs:
       run: |
         docker tag devops-app:${{ github.sha }} \
         $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/devops-app:${{ github.sha }}
+    
+    - name: Create ECR Repository if not exists
+      run: |
+        aws ecr describe-repositories --repository-names devops-app --region $AWS_REGION || \
+        aws ecr create-repository --repository-name devops-app --region $AWS_REGION
 
     - name: Push Image to ECR
       run: |
