@@ -8,6 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:   # ✅ ADD THIS
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
@@ -19,10 +23,19 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    - name: Verify AWS Identity (DEBUG - KEEP THIS)
+      run: aws sts get-caller-identity
+
+    - name: Debug Variables (IMPORTANT)
+      run: |
+        echo "Region: $AWS_REGION"
+        echo "Account: $AWS_ACCOUNT_ID"
+
     - name: Login to ECR
       run: |
         aws ecr get-login-password --region $AWS_REGION | \
-        docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+        docker login --username AWS --password-stdin \
+        $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
     - name: Build Docker Image
       run: |
